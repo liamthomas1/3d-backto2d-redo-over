@@ -8,6 +8,8 @@ public class Movement : MonoBehaviour
     public CharacterController Controller;
     public float speed = 10f;
     public float turnsmoothtime = 0.1f;
+    public Transform cam;
+    float turnSmoothVelocity;
     
     // Start is called before the first frame update
     void Start()
@@ -32,9 +34,11 @@ public class Movement : MonoBehaviour
         Vector3 direction = new Vector3(x, 0f, y).normalized;
         if(direction.magnitude > 0.1f)
 		{
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-            Controller.Move(direction * speed * Time.deltaTime);
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnsmoothtime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+            Controller.Move(moveDir * speed * Time.deltaTime);
 		}
        
         
